@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Wireframe Model Animation</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+            display: block;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="wireframeCanvas" width="800" height="800"></canvas>
+
+    <script>
+        const canvas = document.getElementById('wireframeCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const vertices = [
+            { x: -50, y: -50, z: -50 },
+            { x: 50, y: -50, z: -50 },
+            { x: 50, y: 50, z: -50 },
+            { x: -50, y: 50, z: -50 },
+            { x: -50, y: -50, z: 50 },
+            { x: 50, y: -50, z: 50 },
+            { x: 50, y: 50, z: 50 },
+            { x: -50, y: 50, z: 50 },
+        ];
+
+        const edges = [
+            [0, 1], [1, 2], [2, 3], [3, 0],
+            [4, 5], [5, 6], [6, 7], [7, 4],
+            [0, 4], [1, 5], [2, 6], [3, 7],
+        ];
+
+        let angleX = 0;
+        let angleY = 0;
+        const rotationSpeed = 0.01;
+
+        function rotate3DModel() {
+            for (let i = 0; i < vertices.length; i++) {
+                const vertex = vertices[i];
+                const x = vertex.x;
+                const y = vertex.y;
+                vertex.x = x * Math.cos(angleX) - y * Math.sin(angleX);
+                vertex.y = x * Math.sin(angleX) + y * Math.cos(angleX);
+                const z = vertex.z;
+                vertex.z = z * Math.cos(angleY) - x * Math.sin(angleY);
+                vertex.x = z * Math.sin(angleY) + x * Math.cos(angleY);
+            }
+        }
+
+        function draw3DModel() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < edges.length; i++) {
+                const [startIdx, endIdx] = edges[i];
+                const start = vertices[startIdx];
+                const end = vertices[endIdx];
+
+                const gradient = ctx.createLinearGradient(
+                    start.x + canvas.width / 2, start.y + canvas.height / 2,
+                    end.x + canvas.width / 2, end.y + canvas.height / 2
+                );
+                gradient.addColorStop(0, 'red');
+                gradient.addColorStop(1, 'blue');
+
+                ctx.beginPath();
+                ctx.moveTo(start.x + canvas.width / 2, start.y + canvas.height / 2);
+                ctx.lineTo(end.x + canvas.width / 2, end.y + canvas.height / 2);
+                ctx.strokeStyle = gradient;
+                ctx.stroke();
+            }
+        }
+
+        function animate() {
+            rotate3DModel();
+            draw3DModel();
+            angleX += rotationSpeed;
+            angleY += rotationSpeed;
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
