@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triangle Scaling</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="triangleCanvas" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById('triangleCanvas');
+        const tScale = canvas.getContext('2d');
+        class Point {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+        }
+        function drawLine(start, end) {
+            tScale.beginPath();
+            tScale.moveTo(start.x, start.y);
+            tScale.lineTo(end.x, end.y);
+            tScale.stroke();
+        }
+        function drawTriangle(points) {
+            tScale.beginPath();
+            tScale.moveTo(points[0].x, points[0].y);
+            tScale.lineTo(points[1].x, points[1].y);
+            tScale.lineTo(points[2].x, points[2].y);
+            tScale.closePath();
+            tScale.stroke();
+        }
+        function scalePoint(point, center, scaleFactor) {
+            point.x = center.x + scaleFactor * (point.x - center.x);
+            point.y = center.y + scaleFactor * (point.y - center.y);
+        }
+        function scaleTriangle(points, center, scaleFactor) {
+            points.forEach(point => {
+                scalePoint(point, center, scaleFactor);
+            });
+        }
+        const pointA = new Point(100, 100);
+        const pointB = new Point(200, 50);
+        const pointC = new Point(300, 100);
+        const centerPoint = new Point(200, 150);
+        const scaleFactor = 2;
+        drawTriangle([pointA, pointB, pointC]);
+        scaleTriangle([pointA, pointB, pointC], centerPoint, scaleFactor);
+        drawTriangle([pointA, pointB, pointC]);
+    </script>
+</body>
+</html>

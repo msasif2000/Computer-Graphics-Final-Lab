@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Point Scaling</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="lineCanvas" width="400" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('lineCanvas');
+        const scale = canvas.getContext('2d');
+        class Point {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+        }
+        function drawLine(start, end) {
+            scale.beginPath();
+            scale.moveTo(start.x, start.y);
+            scale.lineTo(end.x, end.y);
+            scale.stroke();
+        }
+
+        function scalePoint(point, scaleFactor) {
+            point.x *= scaleFactor;
+            point.y *= scaleFactor;
+        }
+        const originalPoint = new Point(100, 100);
+        const scaleFactor = 2; // Change this value for scaling factor
+        scale.fillStyle = 'red';
+        scale.fillRect(originalPoint.x - 5, originalPoint.y - 5, 10, 10);
+        const scaledPoint = new Point(originalPoint.x, originalPoint.y);
+        scalePoint(scaledPoint, scaleFactor);
+        scale.fillStyle = 'blue';
+        scale.fillRect(scaledPoint.x - 5, scaledPoint.y - 5, 10, 10);
+        drawLine(originalPoint, scaledPoint);
+    </script>
+</body>
+</html>

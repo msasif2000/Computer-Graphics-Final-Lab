@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polygon Clipping</title>
+    <style>
+        canvas {
+            border: 1px solid #000;}
+    </style>
+</head>
+<body>
+    <canvas id="polygonCanvas" width="400" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('polygonCanvas');
+        const PClipping = canvas.getContext('2d');
+        function sutherlandHodgman(subjectPolygon, clipPolygon) {
+            let outputPolygon = [...subjectPolygon];
+
+            for (let i = 0; i < clipPolygon.length; i++) {
+                const clipEdgeStart = clipPolygon[i];
+                const clipEdgeEnd = clipPolygon[(i + 1) % clipPolygon.length];
+
+                outputPolygon = clipWithEdge(outputPolygon, clipEdgeStart, clipEdgeEnd);
+            }
+            return outputPolygon;
+        }
+        function clipWithEdge(inputPolygon, edgeStart, edgeEnd) {
+            const outputPolygon = [];
+            for (let i = 0; i < inputPolygon.length; i++) {
+                const currentPoint = inputPolygon[i];
+                const nextPoint = inputPolygon[(i + 1) % inputPolygon.length];
+
+                if (isInside(edgeStart, edgeEnd, nextPoint)) {
+                    if (!isInside(edgeStart, edgeEnd, currentPoint)) {
+                        const intersection = getIntersection(edgeStart, edgeEnd, currentPoint, nextPoint);
+                        outputPolygon.push(intersection);
+                    }
+                    outputPolygon.push(nextPoint);
+                } else if (isInside(edgeStart, edgeEnd, currentPoint)) {
+                    const intersection = getIntersection(edgeStart, edgeEnd, currentPoint, nextPoint);
+                    outputPolygon.push(intersection);
+                }
+            }
+            return outputPolygon;
+        }
+        function isInside(edgeStart, edgeEnd, point) {
+            const crossProduct = (edgeEnd.x - edgeStart.x) * (point.y - edgeStart.y) -
+                                 (edgeEnd.y - edgeStart.y) * (point.x - edgeStart.x);
+            return crossProduct >= 0;
+        }
+        function getIntersection(a, b, c, d) {
+            const uA = ((d.x - c.x) * (a.y - c.y) - (d.y - c.y) * (a.x - c.x)) /
+                       ((d.y - c.y) * (b.x - a.x) - (d.x - c.x) * (b.y - a.y));
+
+            const intersection = {
+                x: a.x + uA * (b.x - a.x),
+                y: a.y + uA * (b.y - a.y),
+            };
+            return intersection;
+        }
+        function drawPolygon(polygon, color) {
+            PClipping.beginPath();
+            PClipping.moveTo(polygon[0].x, polygon[0].y);
+            for (let i = 1; i < polygon.length; i++) {
+                PClipping.lineTo(polygon[i].x, polygon[i].y);
+            }
+            PClipping.closePath();
+            PClipping.fillStyle = color;
+            PClipping.fill();
+        }
+        const subjectPolygon = [
+            { x: 100, y: 100 },
+            { x: 300, y: 100 },
+            { x: 300, y: 300 },
+            { x: 100, y: 300 },
+        ];
+        const clipPolygon = [
+            { x: 150, y: 150 },
+            { x: 250, y: 150 },
+            { x: 250, y: 250 },
+            { x: 150, y: 250 },
+        ];
+        const clippedPolygon = sutherlandHodgman(subjectPolygon, clipPolygon);
+        drawPolygon(subjectPolygon, 'blue');
+        drawPolygon(clipPolygon, 'green');
+        drawPolygon(clippedPolygon, 'red');
+    </script>
+</body>
+</html>

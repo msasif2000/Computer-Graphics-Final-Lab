@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triangle Rotation</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="triangleCanvas" width="400" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('triangleCanvas');
+        const triangle = canvas.getContext('2d');
+        class Point {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+        }
+        function drawTriangle(p1, p2, p3) {
+           triangle.beginPath();
+           triangle.moveTo(p1.x, p1.y);
+           triangle.lineTo(p2.x, p2.y);
+           triangle.lineTo(p3.x, p3.y);
+           triangle.closePath();
+           triangle.stroke();
+        }
+        function rotatePoint(point, center, angle) {
+            const radians = (Math.PI / 180) * angle;
+            const x = point.x - center.x;
+            const y = point.y - center.y;
+            const newX = x * Math.cos(radians) - y * Math.sin(radians);
+            const newY = x * Math.sin(radians) + y * Math.cos(radians);
+            point.x = newX + center.x;
+            point.y = newY + center.y;
+        }
+
+        function rotateTriangle(p1, p2, p3, center, angle) {
+            rotatePoint(p1, center, angle);
+            rotatePoint(p2, center, angle);
+            rotatePoint(p3, center, angle);
+        }
+        const point1 = new Point(150, 100);
+        const point2 = new Point(200, 200);
+        const point3 = new Point(250, 100);
+        const centerPoint = new Point(200, 200);
+        const rotationAngle = 45;
+        drawTriangle(point1, point2, point3)
+        rotateTriangle(point1, point2, point3, centerPoint, rotationAngle);
+        drawTriangle(point1, point2, point3);
+    </script>
+</body>
+</html>

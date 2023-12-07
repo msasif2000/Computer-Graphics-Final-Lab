@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cohen-Sutherland Line Clipping</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <label for="startX">Start X:</label>
+    <input type="number" id="startX" value="50">
+    <br>
+    <label for="startY">Start Y:</label>
+    <input type="number" id="startY" value="150">
+    <br>
+    <label for="endX">End X:</label>
+    <input type="number" id="endX" value="250">
+    <br>
+    <label for="endY">End Y:</label>
+    <input type="number" id="endY" value="350">
+    <br>
+    <button onclick="clipLine()">Clip Line</button>
+    <br>
+    <canvas id="lineCanvas" width="400" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('lineCanvas');
+        const CSLineClipping = canvas.getContext('2d');
+
+        const INSIDE = 0;
+        const LEFT = 1;
+        const RIGHT = 2;
+        const BOTTOM = 4;
+        const TOP = 8;
+
+        const xMin = 100;
+        const xMax = 300;
+        const yMin = 100;
+        const yMax = 300;
+
+        function computeCode(x, y) {
+            let code = INSIDE;
+
+            if (x < xMin) {
+                code |= LEFT;
+            } else if (x > xMax) {
+                code |= RIGHT;
+            }
+
+            if (y < yMin) {
+                code |= BOTTOM;
+            } else if (y > yMax) {
+                code |= TOP;
+            }
+
+            return code;
+        }
+
+        function cohenSutherlandClip(startX, startY, endX, endY) {
+            let codeStart = computeCode(startX, startY);
+            let codeEnd = computeCode(endX, endY);
+
+            let accept = false;
+
+            while (true) {
+                if (!(codeStart | codeEnd)) {
+                    accept = true;
+                    break;
+                } else if (codeStart & codeEnd) {
+                    break;
+                } else {
+                    let x, y;
+                    const codeOutside = codeStart || codeEnd;
+
+                    if (codeOutside & TOP) {
+                        x = startX + (endX - startX) * (yMax - startY) / (endY - startY);
+                        y = yMax;
+                    } else if (codeOutside & BOTTOM) {
+                        x = startX + (endX - startX) * (yMin - startY) / (endY - startY);
+                        y = yMin;
+                    } else if (codeOutside & RIGHT) {
+                        y = startY + (endY - startY) * (xMax - startX) / (endX - startX);
+                        x = xMax;
+                    } else if (codeOutside & LEFT) {
+                        y = startY + (endY - startY) * (xMin - startX) / (endX - startX);
+                        x = xMin;
+                    }
+
+                    if (codeOutside === codeStart) {
+                        startX = x;
+                        startY = y;
+                        codeStart = computeCode(startX, startY);
+                    } else {
+                        endX = x;
+                        endY = y;
+                        codeEnd = computeCode(endX, endY);
+                    }
+                }
+            }
+
+            if (accept) {
+                drawLine(startX, startY, endX, endY);
+            }
+        }
+
+        function drawLine(x1, y1, x2, y2) {
+            CSLineClipping.clearRect(0, 0, canvas.width, canvas.height);
+            CSLineClipping.beginPath();
+            CSLineClipping.moveTo(x1, y1);
+            CSLineClipping.lineTo(x2, y2);
+            CSLineClipping.stroke();
+        }
+
+        function clipLine() {
+            const startX = parseFloat(document.getElementById('startX').value);
+            const startY = parseFloat(document.getElementById('startY').value);
+            const endX = parseFloat(document.getElementById('endX').value);
+            const endY = parseFloat(document.getElementById('endY').value);
+
+            cohenSutherlandClip(startX, startY, endX, endY);
+        }
+    </script>
+</body>
+</html>

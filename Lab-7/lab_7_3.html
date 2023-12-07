@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Line Rotation</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="lineCanvas" width="400" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('lineCanvas');
+        const line = canvas.getContext('2d');
+
+        class Point {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+        }
+        function drawLine(start, end) {
+            line.beginPath();
+            line.moveTo(start.x, start.y);
+            line.lineTo(end.x, end.y);
+            line.stroke();
+        }
+        function rotatePoint(point, center, angle) {
+            const radians = (Math.PI / 180) * angle;
+            const x = point.x - center.x;
+            const y = point.y - center.y;
+            const newX = x * Math.cos(radians) - y * Math.sin(radians);
+            const newY = x * Math.sin(radians) + y * Math.cos(radians);
+            point.x = newX + center.x;
+            point.y = newY + center.y;
+        }
+        function rotateLine(start, end, center, angle) {
+            rotatePoint(start, center, angle);
+            rotatePoint(end, center, angle);
+        }
+        const startPoint = new Point(100, 100);
+        const endPoint = new Point(300, 100);
+        const centerPoint = new Point(100, 100);
+        const rotationAngle = 30;
+
+        drawLine(startPoint, endPoint);
+        rotateLine(startPoint, endPoint, centerPoint, rotationAngle);
+        drawLine(startPoint, endPoint);
+    </script>
+</body>
+</html>

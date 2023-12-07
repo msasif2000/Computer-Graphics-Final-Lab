@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liang-Barsky Line Clipping</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="lineCanvas" width="400" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('lineCanvas');
+        const LBLineClipping = canvas.getContext('2d');
+
+        function liangBarsky(x0, y0, x1, y1, xmin, ymin, xmax, ymax) {
+            const dx = x1 - x0;
+            const dy = y1 - y0;
+            let t0 = 0;
+            let t1 = 1;
+
+            if (clipTest(-dx, x0 - xmin, t0, t1)) {
+                if (clipTest(dx, xmax - x0, t0, t1)) {
+                    if (clipTest(-dy, y0 - ymin, t0, t1)) {
+                        if (clipTest(dy, ymax - y0, t0, t1)) {
+                            const x0Clip = x0 + t0 * dx;
+                            const y0Clip = y0 + t0 * dy;
+                            const x1Clip = x0 + t1 * dx;
+                            const y1Clip = y0 + t1 * dy;
+
+                            LBLineClipping.beginPath();
+                            LBLineClipping.moveTo(x0Clip, y0Clip);
+                            LBLineClipping.lineTo(x1Clip, y1Clip);
+                            LBLineClipping.stroke();
+                        }
+                    }
+                }
+            }
+        }
+        function clipTest(p, q, t0, t1) {
+            const r = q / p;
+            if (p < 0) {
+                if (r > t1) return false;
+                if (r > t0) t0 = r;
+            } else if (p > 0) {
+                if (r < t0) return false;
+                if (r < t1) t1 = r;
+            } else {
+                if (q < 0) return false;
+            }
+
+            return true; }
+        function drawLine(x0, y0, x1, y1) {
+            LBLineClipping.beginPath();
+            LBLineClipping.moveTo(x0, y0);
+            LBLineClipping.lineTo(x1, y1);
+            LBLineClipping.stroke();
+        }
+        function drawClippingWindow(xmin, ymin, xmax, ymax) {
+            LBLineClipping.beginPath();
+            LBLineClipping.rect(xmin, ymin, xmax - xmin, ymax - ymin);
+            LBLineClipping.stroke();
+        }
+        const xmin = 100;
+        const ymin = 100;
+        const xmax = 300;
+        const ymax = 300;
+        drawClippingWindow(xmin, ymin, xmax, ymax);
+        const x0 = 50;
+        const y0 = 200;
+        const x1 = 250;
+        const y1 = 50;
+        drawLine(x0, y0, x1, y1);
+        liangBarsky(x0, y0, x1, y1, xmin, ymin, xmax, ymax);
+    </script>
+</body>
+</html>

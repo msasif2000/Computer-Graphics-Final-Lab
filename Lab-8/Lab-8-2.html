@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triangle Scaling</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="triangleCanvas" width="500" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('triangleCanvas');
+        const tScale = canvas.getContext('2d');
+
+        class Point {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+        }
+        function drawTriangle(vertices) {
+            tScale.beginPath();
+            tScale.moveTo(vertices[0].x, vertices[0].y);
+            tScale.lineTo(vertices[1].x, vertices[1].y);
+            tScale.lineTo(vertices[2].x, vertices[2].y);
+            tScale.closePath();
+            tScale.stroke();
+        }
+        function scalePoint(point, scaleFactor) {
+            point.x *= scaleFactor;
+            point.y *= scaleFactor;
+        }
+        function scaleTriangle(vertices, scaleFactor) {
+            for (const vertex of vertices) {
+                scalePoint(vertex, scaleFactor);
+            }
+        }
+        const triangleVertices = [
+            new Point(100, 100),
+            new Point(200, 100),
+            new Point(150, 200)
+        ];
+        drawTriangle(triangleVertices);
+        const scaleFactor = 2;
+        scaleTriangle(triangleVertices, scaleFactor);
+        drawTriangle(triangleVertices);
+    </script>
+</body>
+</html>
